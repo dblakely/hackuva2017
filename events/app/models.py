@@ -11,3 +11,12 @@ class Event(models.Model):
     latitude = models.DecimalField(max_digits=50, decimal_places=20)
     longitude = models.DecimalField(max_digits=50, decimal_places=20)
 
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'location_name': self.location_name,
+            'datetime': self.datetime.isoformat(),
+            'latitude': float(self.latitude),
+            'longitude': float(self.longitude),
+        }
+
