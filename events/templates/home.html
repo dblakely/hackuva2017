@@ -85,12 +85,12 @@
 
 <!-- BUTTONS FOR CATEGORIES -->
 <div id="categories">
-    <button class='b1' onclick="categoryClick(this, 'party')">Parties</button>
-    <button class='b1' onclick="categoryClick(this, 'talk')" id="talk">Talks</button>
-    <button class='b1' onclick="categoryClick(this, 'hackathon')" id="hackathon">Hackathons</button>
-    <button class='b1' onclick="categoryClick(this, 'show')" id="show">Shows</button>
-    <button class='b1' onclick="categoryClick(this, 'sports')" id="sports">Sports</button>
-    <button class='b1' onclick="categoryClick(this, 'other')" id="other">Other</button>
+    <button class='b1' onclick="categoryClick(this, 'party')" id="Party">Parties</button>
+    <button class='b1' onclick="categoryClick(this, 'sale')" id="Sale">Sale</button>
+    <button class='b1' onclick="categoryClick(this, 'hackathon')" id="Hackathon">Hackathons</button>
+    <button class='b1' onclick="categoryClick(this, 'show')" id="Show">Shows</button>
+    <button class='b1' onclick="categoryClick(this, 'sports')" id="Sport">Sports</button>
+    <button class='b1' onclick="categoryClick(this, 'other')" id="Other">Other</button>
 </div><br>
 
 <!-- FILTER FORM  -->
@@ -136,7 +136,7 @@
 <script>
       var activeCategories = ["Party", "Talk", "Show", "Hackathon", "Sport", "Other"];
       var date_filter_active = true;
-      var category_filter_active = false;
+      var category_filter_active = true;
       var distance_filter_active = true;
       var myLocation = {'lat': 38.034, 'long': -78.504}
 
@@ -152,7 +152,7 @@
 
       function redrawEvents(events){
         filtered = events;
-        // if (category_filter_active) filtered = filterEventsByCategory(filtered);
+        if (category_filter_active) filtered = filterEventsByCategory(filtered);
         if (date_filter_active) filtered = filterEventsByDate(filtered, $('#sd').val(), $('#ed').val());
         if (distance_filter_active) filtered = filterEventsByDistance(filtered);
         console.log("" + events.length + " " + filtered.length);
@@ -179,7 +179,8 @@
         var fl = [];
         for (var i=0; i<events.length; i++){
             var event = events[i];
-            if(activeCategories.includes(event.category)){
+            console.log($("#" + event.category));
+            if ($("#" + event.category).attr('class') == "b1"){
              fl.push(event);
             }
         }
@@ -224,14 +225,10 @@
       function categoryClick(button, category) {
             if (button.className == 'b1') {
               button.className = 'b2';
-              remove(category);
             }
             else if (button.className == 'b2') {
               button.className = 'b1';
-              activeCategories.push(category);
             }
-            // var filteredList = getFilteredEventList();
-            console.log(activeCategories);
             reget();
       };
 
