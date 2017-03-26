@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Events</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+      <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link  rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        border:2px solid black ;
+        height: 400px;
+        width: 10px
+        margin: 10px;
+        padding: 5px;
+      }
+      table, th, td{
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+        <h1>Event Finder</h1>
+    </div>
+    <div id="map" ></div>
+    <br>
+    <h3>Current Events</h3>
+    <table>
+            <tr>
+                <td><b>Event Name</b></td>
+                <td><b>Latitude</b></td>
+                <td><b>Longitude</b></td>
+                <td><b>Location Name</b></td>
+                <td><b>Date and Time</b></td>
+            </tr>
+            {% for event in events%}
+                <tr>
+                    <td>{{event.name}}</td>
+                    <td>{{event.latitude}}</td>
+                    <td>{{event.longitude}}</td>
+                    <td>{{event.location_name}}</td>
+                    <td>{{event.datetime}}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    <script>
+
+      function initMap() {
+        var myLatlng = {lat: 38.034, lng: -78.504};
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 4,
+          center: myLatlng
+        });
+
+        var infoWindow = new google.maps.InfoWindow({map: map});
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                infoWindow.setPosition(pos);
+                infoWindow.setContent('Location found.');
+                map.setCenter(pos);
+             }, function() {
+                handleLocationError(true, infoWindow, map.getCenter());
+             });
+            } else {
+            // Browser doesn't support Geolocation
+            handleLocationError(false, infoWindow, map.getCenter());
+         }
+
+        {% for event in events%}
+            var name = '{{event.name}}';
+            var lat = '{{event.latitude}}';
+            lat = parseFloat(lat);
+            var long = '{{event.longitude}}';
+            long = parseFloat(long);
+            var location_name = '{{event.location_name}}';
+            var datetime = '{{event.datetime}}';
+            var latLng = {lat: lat,lng: long};
+
+            var marker = new google.maps.Marker({
+                position: latLng,
+                map: map,
+                title: name
+            });
+
+        {% endfor %}
+
+        /*
+        for each (event in events) {
+            var latLng = {lat: parseFloat(event.latitude),
+            parseFloat(lng: event.longitude)}
+            var marker = new google.maps.Marker({
+                position: latLng,
+                map: map,
+                title: 'Click to zoom'
+             });
+        }*/
+
+        var marker = new google.maps.Marker({
+          position: myLatlng,
+          map: map,
+          title: 'Click to zoom'
+        });
+
+
+        map.addListener('center_changed', function() {
+          window.setTimeout(function() {
+            map.panTo(marker.getPosition());
+          }, 3000);
+        });
+
+        marker.addListener('click', function() {
+          map.setZoom(8);
+          map.setCenter(marker.getPosition());
+        });
+
+      }
+
+      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(browserHasGeolocation ?
+            'Error: The Geolocation service failed.' :
+            'Error: Your browser doesn\'t support geolocation.');
+      }
+
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDT72PMyTM_tomBmjdQgOHhgAopKlTJMw0&callback=initMap">
+    </script>
+  </body>
+</html>
