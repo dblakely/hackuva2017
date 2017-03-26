@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <title>Events</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-      <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <link  rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
     <style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
@@ -16,46 +17,251 @@
         margin: 10px;
         padding: 5px;
       }
-      table, th, td{
+      #eventsTable {
+        border: 1px solid black;
+        cell-spacing: 100px;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f2f5;
+      }
+
+      #categoryTable {
+        width:80%;
+        border-radius: 20px;
         border: 1px solid black;
       }
-    </style>
-  </head>
-  <body>
-    <div>
-        <h1>Event Finder</h1>
-    </div>
-    <div id="map" ></div>
-    <br>
-    <h3>Current Events</h3>
-    <table>
-            <tr>
-                <td><b>Event Name</b></td>
-                <td><b>Latitude</b></td>
-                <td><b>Longitude</b></td>
-                <td><b>Location Name</b></td>
-                <td><b>Date and Time</b></td>
-            </tr>
-            {% for event in events%}
-                <tr>
-                    <td>{{event.name}}</td>
-                    <td>{{event.latitude}}</td>
-                    <td>{{event.longitude}}</td>
-                    <td>{{event.location_name}}</td>
-                    <td>{{event.datetime}}</td>
-                </tr>
-            {% endfor %}
-        </table>
-    <script>
+      .t1 {
+        background: #00;
+      }
 
-      function initMap() {
+      .b2 {
+        background-color: #00;
+        border: none;
+        color: black;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+      }
+      .b1 {
+        background: #6699ff;
+        border: none;
+        color: black;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+      }
+      button:hover {
+        opacity:0.75;
+      }
+      #floating-panel {
+        position: absolute;
+        top: 10px;
+        left: 25%;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+      }
+      tr:nth-child(even) {
+        background-color: #fafafa;
+      }
+
+      th, td {
+       padding: 15px;
+       text-align: left;
+     }
+
+    </style>
+</head>
+<body>
+
+<div>
+    <h1>Hoos Out</h1>
+    <h3>Events. Near you.</h3>
+</div>
+
+<!-- BUTTONS FOR CATEGORIES -->
+<div id="categories">
+    <button class='b1' onclick="categoryClick(this, 'party')" id="Party">Parties</button>
+    <button class='b1' onclick="categoryClick(this, 'sale')" id="Sale">Sale</button>
+    <button class='b1' onclick="categoryClick(this, 'hackathon')" id="Hackathon">Hackathons</button>
+    <button class='b1' onclick="categoryClick(this, 'show')" id="Show">Shows</button>
+    <button class='b1' onclick="categoryClick(this, 'sports')" id="Sport">Sports</button>
+    <button class='b1' onclick="categoryClick(this, 'other')" id="Other">Other</button>
+</div><br>
+
+<!-- FILTER FORM  -->
+<table>
+<tr>
+  <td>Start date:</td><td><input id="sd" type="date" name="startdate" onchange="reget()" value="2016-03-26"></td>
+</tr>
+<tr>
+  <td>End date: </td><td><input id="ed" type="date" name="enddate" onchange="reget()" value="2017-04-26"></td>
+</tr>
+<tr>
+  <td>Within </td><td><input type="number" id="radius" min="0" max="25000" step="0.5" value="50" onkeypress="reget()"> miles</td>
+</tr>
+<tr>
+  <!--<td><input type="submit" value="go" onclick="milesFilter()"></td>-->
+</tr>
+</table>
+
+
+<!-- IM THE MAP! -->
+
+<div id="map"></div>
+<br>
+
+<!-- EVENTS TABLE -->
+
+<h3>Current Events</h3>
+<table id="events-table">
+    <thead>
+    <td><b>Event Name</b></td>
+    <td><b>Category</b></td>
+    <td><b>Latitude</b></td>
+    <td><b>Longitude</b></td>
+    <td><b>Location Name</b></td>
+    <td><b>Date and Time</b></td>
+    </thead>
+    <tbody id="events-body">
+    </tbody>
+</table>
+
+<!-- THE BUSINESS -->
+
+<script>
+      var activeCategories = ["Party", "Talk", "Show", "Hackathon", "Sport", "Other"];
+      var date_filter_active = true;
+      var category_filter_active = true;
+      var distance_filter_active = true;
+      var myLocation = {'lat': 38.034, 'long': -78.504}
+
+      $.get("/app/events", function(data){
+        redrawEvents(data['events']);
+      });
+
+      function reget(){
+        $.get("/app/events", function(data){
+            redrawEvents(data['events']);
+        });
+      };
+
+      function redrawEvents(events){
+        filtered = events;
+        if (category_filter_active) filtered = filterEventsByCategory(filtered);
+        if (date_filter_active) filtered = filterEventsByDate(filtered, $('#sd').val(), $('#ed').val());
+        if (distance_filter_active) filtered = filterEventsByDistance(filtered);
+        // console.log("" + events.length + " " + filtered.length);
+        makeMap(filtered);
+        makeTable(filtered);
+      };
+
+      function filterEventsByDate(events, startDate, endDate){
+        start_date = new Date(startDate);
+        end_date = new Date(endDate);
+        filtered_events = [];
+        // console.log(startDate);
+        for (var i=0; i<events.length;i++){
+            var event = events[i];
+            var event_date = new Date(event.datetime);
+            if (event_date >= start_date && event_date <= end_date){
+                filtered_events.push(event);
+            }
+        }
+        return filtered_events;
+      };
+
+      function filterEventsByCategory(events){
+        var fl = [];
+        for (var i=0; i<events.length; i++){
+            var event = events[i];
+            // console.log($("#" + event.category));
+            if ($("#" + event.category).attr('class') == "b1"){
+             fl.push(event);
+            }
+        }
+        // console.log(events.length);
+        // console.log(fl.length);
+        return fl;
+      };
+
+      function filterEventsByDistance(events) {
+        var distanceFilteredList = [];
+        var radius = parseFloat(document.getElementById("radius").value);
+        for (var i = 0; i < events.length; i++) {
+            var event = events[i];
+            var lat = parseFloat(event.latitude);
+            var long = parseFloat(event.longitude);
+            distance = getDistanceFromLatLong(myLocation.lat, myLocation.long, lat, long);
+            if (distance <= radius) {
+                //alert(event.name);
+                distanceFilteredList.push(event);
+            }
+        }
+        return distanceFilteredList;
+      };
+
+      function getDistanceFromLatLong(lat1,lon1,lat2,lon2) {
+        var R = 6371; // Radius of the earth in km
+        var dLat = deg2rad(lat2-lat1);  // deg2rad below
+        var dLon = deg2rad(lon2-lon1);
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        var d = R * c; // Distance in km
+        d = (0.621371) * d;
+        return d;
+      };
+
+    function deg2rad(deg) {
+        return deg * (Math.PI/180);
+    };
+
+      function categoryClick(button, category) {
+            if (button.className == 'b1') {
+              button.className = 'b2';
+            }
+            else if (button.className == 'b2') {
+              button.className = 'b1';
+            }
+            reget();
+      };
+
+      function remove(category) {
+           var index = -1;
+           for (var i = 0; i < activeCategories.length; i++) {
+               if (activeCategories[i] == category) {
+                   index = i;
+                }
+          }
+          activeCategories.splice(index, 1);
+      };
+
+      function makeMap(events){
         var myLatlng = {lat: 38.034, lng: -78.504};
+
         var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 4,
+          zoom: 15,
           center: myLatlng
         });
 
         var infoWindow = new google.maps.InfoWindow({map: map});
+
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 var pos = {
@@ -69,70 +275,60 @@
              }, function() {
                 handleLocationError(true, infoWindow, map.getCenter());
              });
-            } else {
-            // Browser doesn't support Geolocation
+            }
+        else {
             handleLocationError(false, infoWindow, map.getCenter());
-         }
+        }
 
-        {% for event in events%}
-            var name = '{{event.name}}';
-            var lat = '{{event.latitude}}';
-            lat = parseFloat(lat);
-            var long = '{{event.longitude}}';
-            long = parseFloat(long);
-            var location_name = '{{event.location_name}}';
-            var datetime = '{{event.datetime}}';
-            var latLng = {lat: lat,lng: long};
+        events.forEach(
+            function(event){
+                marker = new google.maps.Marker({
+                    position: {lat: event.latitude, lng: event.longitude},
+                    map: map,
+                    title: event.name
+                });
 
-            var marker = new google.maps.Marker({
-                position: latLng,
-                map: map,
-                title: name
-            });
-
-        {% endfor %}
-
-        /*
-        for each (event in events) {
-            var latLng = {lat: parseFloat(event.latitude),
-            parseFloat(lng: event.longitude)}
-            var marker = new google.maps.Marker({
-                position: latLng,
-                map: map,
-                title: 'Click to zoom'
-             });
-        }*/
-
-        var marker = new google.maps.Marker({
-          position: myLatlng,
-          map: map,
-          title: 'Click to zoom'
-        });
+                // var contentString = event.name;
+                // var y = contentString.split(' ').slice(0,5).join(' ');
+                // var infowindow = new google.maps.InfoWindow({content: y});
+                // infowindow.open(map, marker);
+                google.maps.event.addListener(marker, 'click', function () {
+                // do something with this marker ...
 
 
-        map.addListener('center_changed', function() {
-          window.setTimeout(function() {
-            map.panTo(marker.getPosition());
-          }, 3000);
-        });
+                var contentString = this.title;
+                var y = contentString.split(' ').slice(0,5).join(' ');
+                var infowindow = new google.maps.InfoWindow({ content: y });
+                infowindow.open(map, this);
+                });
+            }
+        );
+      };
 
-        marker.addListener('click', function() {
-          map.setZoom(8);
-          map.setCenter(marker.getPosition());
-        });
+      function makeTable(events){
+        /* Clear the Table */
+        $("#events-body").html("");
 
-      }
+        /* Re-add the Rows */
+        for (var i=0; i<events.length; i++){
+            var event = events[i];
+            var new_row = '<tr>';
+            new_row += '<td>' + event.name + '</td>'
+            new_row += '<td>' + event.category + '</td>'
+            new_row += '<td>' + event.latitude.toFixed(3) + '</td>'
+            new_row += '<td>' + event.longitude.toFixed(3) + '</td>'
+            new_row += '<td>' + event.location_name + '</td>'
+            new_row += '<td>' + new Date(event.datetime).toDateString() + '</td>'
+            new_row += '</tr>'
+            $("#events-table > tbody:last-child").append(new_row);
+        }
+      };
 
-      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-        infoWindow.setPosition(pos);
-        infoWindow.setContent(browserHasGeolocation ?
-            'Error: The Geolocation service failed.' :
-            'Error: Your browser doesn\'t support geolocation.');
-      }
 
-    </script>
-    <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDT72PMyTM_tomBmjdQgOHhgAopKlTJMw0&callback=initMap">
-    </script>
-  </body>
+
+</script>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDT72PMyTM_tomBmjdQgOHhgAopKlTJMw0&callback=initMap">
+</script>
+</body>
 </html>

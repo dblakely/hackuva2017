@@ -89,6 +89,17 @@
     }
   },
   {
+    "model": "app.event",
+    "pk": 5,
+    "fields": {
+      "name": "Queer Ball",
+      "location_name": "In the minds of those who knew her",
+      "datetime": "2017-04-21T05:00:00Z",
+      "latitude": "38.036059000000000000000",
+      "longitude": "-78.50672300000000000000"
+    }
+  },
+  {
     "model": "auth.permission",
     "pk": 1,
     "fields": {
