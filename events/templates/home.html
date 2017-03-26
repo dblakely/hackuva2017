@@ -10,7 +10,7 @@
     <style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
-#map {
+      #map {
         border:2px solid black ;
         height: 400px;
         width: 10px
@@ -97,24 +97,28 @@
 <form id="filterForm">
   <table>
     <tr>
-      <td>Start date:</td><td><input type="date" name="startdate"></td>
+      <td>Start date:</td><td><input type="date" name="startdate" onchange="reget()" value="2016-03-26"></td>
     </tr>
     <tr>
-      <td>End date: </td><td><input type="date" name="enddate"></td>
+      <td>End date: </td><td><input type="date" name="enddate" onchange="reget()" value="2017-04-26"></td>
     </tr>
     <tr>
-      <td>Within </td><td><input type="number" name="radius" min="0" max="25000" step="0.5"> miles</td>
+      <td>Within </td><td><input type="number" id="radius" min="0" max="25000" step="0.5" value="50" onkeypress="reget()"> miles</td>
     </tr>
     <tr>
-      <td><input type="submit" value="go" onclick="milesFilter()"></td>
+      <!--<td><input type="submit" value="go" onclick="milesFilter()"></td>-->
     </tr>
   </table>
 </form>
 
 
+<!-- IM THE MAP! -->
 
 <div id="map"></div>
 <br>
+
+<!-- EVENTS TABLE -->
+
 <h3>Current Events</h3>
 <table id="events-table">
     <thead>
@@ -129,11 +133,34 @@
     </tbody>
 </table>
 
+<!-- THE BUSINESS -->
+
 <script>
+      var activeCategories = ["Party", "Talk", "Show", "Hackathon", "Sport", "Other"];
+      var date_filter_active = false;
+      var category_filter_active = false;
+      var distance_filter_active = true;
+      var myLocation = {'lat': 38.034, 'long': -78.504}
+
       $.get("/app/events", function(data){
         redrawEvents(data['events']);
       });
 
+      function reget(){
+        $.get("/app/events", function(data){
+            redrawEvents(data['events']);
+        });
+      };
+
+      function redrawEvents(events){
+        filtered = events;
+        // if (category_filter_active) filtered = filterEventsByCategory(filtered);
+        // if (date_filter_active) filtered = filterEventsByDate(filtered);
+        if (distance_filter_active) filtered = filterEventsByDistance(filtered);
+        console.log("" + events.length + " " + filtered.length);
+        makeMap(filtered);
+        makeTable(filtered);
+      };
 
       function filterEventsByDate(events, startDate, endDate){
         start_date = new Date(startDate);
@@ -149,9 +176,76 @@
         return filtered_events;
       };
 
-      function redrawEvents(events){
-        makeMap(events);
-        makeTable(events);
+      function filterEventsByCategory(events){
+        var fl = [];
+        for (var i=0; i<events.length; i++){
+            var event = events[i];
+            if(activeCategories.includes(event.category)){
+             fl.push(event);
+            }
+        }
+        console.log(events.length);
+        console.log(fl.length);
+        return fl;
+      };
+
+      function filterEventsByDistance(events) {
+        var distanceFilteredList = [];
+        var radius = parseFloat(document.getElementById("radius").value);
+        alert(radius)
+        for (var i = 0; i < events.length; i++) {
+            var event = events[i];
+            var lat = parseFloat(event.latitude);
+            var long = parseFloat(event.longitude);
+            distance = getDistanceFromLatLong(myLocation.lat, myLocation.long, lat, long);
+            alert(distance);
+            if (distance <= radius) {
+                //alert(event.name);
+                distanceFilteredList.push(event);
+            }
+        }
+        return distanceFilteredList;
+      };
+
+      function getDistanceFromLatLong(lat1,lon1,lat2,lon2) {
+        var R = 6371; // Radius of the earth in km
+        var dLat = deg2rad(lat2-lat1);  // deg2rad below
+        var dLon = deg2rad(lon2-lon1);
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        var d = R * c; // Distance in km
+        d = (0.621371) * d;
+        return d;
+      };
+
+    function deg2rad(deg) {
+        return deg * (Math.PI/180);
+    };
+
+      function categoryClick(button, category) {
+            if (button.className == 'b1') {
+              button.className = 'b2';
+              remove(category);
+            }
+            else if (button.className == 'b2') {
+              button.className = 'b1';
+              activeCategories.push(category);
+            }
+            // var filteredList = getFilteredEventList();
+            console.log(activeCategories);
+            reget();
+      };
+
+      function remove(category) {
+           var index = -1;
+           for (var i = 0; i < activeCategories.length; i++) {
+               if (activeCategories[i] == category) {
+                   index = i;
+                }
+          }
+          activeCategories.splice(index, 1);
       };
 
       function makeMap(events){
