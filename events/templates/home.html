@@ -29,27 +29,22 @@
     <div id="map" ></div>
     <br>
     <h3>Current Events</h3>
-    <table>
-            <tr>
+    <table id="events-table">
+            <thead>
                 <td><b>Event Name</b></td>
                 <td><b>Latitude</b></td>
                 <td><b>Longitude</b></td>
                 <td><b>Location Name</b></td>
                 <td><b>Date and Time</b></td>
-            </tr>
-            {% for event in events%}
-                <tr>
-                    <td>{{event.name}}</td>
-                    <td>{{event.latitude}}</td>
-                    <td>{{event.longitude}}</td>
-                    <td>{{event.location_name}}</td>
-                    <td>{{event.datetime}}</td>
-                </tr>
-            {% endfor %}
+            </thead>
+            <tbody id="events-body">
+            </tbody>
         </table>
+
     <script>
       $.get("/app/events", function(data){
         makeMap(data['events']);
+        makeTable(data['events']);
       });
 
       function makeMap(events){
@@ -89,6 +84,24 @@
                 });
             }
         );
+      };
+
+      function makeTable(events){
+        /* Clear the Table */
+        $("#events-body").html("");
+
+        /* Re-add the Rows */
+        for (var i=0; i<events.length; i++){
+            var event = events[i];
+            var new_row = '<tr>';
+            new_row += '<td>' + event.name + '</td>'
+            new_row += '<td>' + event.latitude + '</td>'
+            new_row += '<td>' + event.longitude + '</td>'
+            new_row += '<td>' + event.location_name + '</td>'
+            new_row += '<td>' + event.datetime + '</td>'
+            new_row += '</tr>'
+            $("#events-table > tbody:last-child").append(new_row);
+        }
       };
 
     </script>
