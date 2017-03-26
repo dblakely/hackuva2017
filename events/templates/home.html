@@ -43,9 +43,13 @@
 
     <script>
       $.get("/app/events", function(data){
-        makeMap(data['events']);
-        makeTable(data['events']);
+        redrawEvents(data['events']);
       });
+
+      function redrawEvents(events){
+        makeMap(events);
+        makeTable(events);
+      };
 
       function makeMap(events){
         var myLatlng = {lat: 38.034, lng: -78.504};
