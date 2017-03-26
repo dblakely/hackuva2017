@@ -10,23 +10,88 @@
     <style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
-      #map {
+#map {
         border:2px solid black ;
         height: 400px;
         width: 10px
         margin: 10px;
         padding: 5px;
       }
-      table, th, td{
+      #eventsTable {
         border: 1px solid black;
+        cell-spacing: 100px;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #categoryTable {
+        width:80%;
+        border-radius: 20px;
+        border: 1px solid black;
+      }
+      .t1 {
+        background: #00;
+      }
+
+      .b2 {
+        background-color: #00;
+        border: none;
+        color: black;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+      }
+      .b1 {
+        background: #6699ff;
+        border: none;
+        color: black;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+      }
+      button:hover {
+        opacity:0.75;
+      }
+      #floating-panel {
+        position: absolute;
+        top: 10px;
+        left: 25%;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
       }
 
     </style>
 </head>
 <body>
+
 <div>
-    <h1>Event Finder</h1>
+    <h1>Hoos Out</h1>
+    <h3>Events. Near you.</h3>
 </div>
+
+<div id="categories">
+    <button class='b1' onclick="categoryClick(this, 'party')">Parties</button>
+    <button class='b1' onclick="categoryClick(this, 'talk')" id="talk">Talks</button>
+    <button class='b1' onclick="categoryClick(this, 'hackathon')" id="hackathon">Hackathons</button>
+    <button class='b1' onclick="categoryClick(this, 'show')" id="show">Shows</button>
+    <button class='b1' onclick="categoryClick(this, 'sports')" id="sports">Sports</button>
+    <button class='b1' onclick="categoryClick(this, 'other')" id="other">Other</button>
+</div><br>
+
 <div id="map"></div>
 <br>
 <h3>Current Events</h3>
@@ -125,6 +190,7 @@
             $("#events-table > tbody:last-child").append(new_row);
         }
       };
+
 
 
 </script>
