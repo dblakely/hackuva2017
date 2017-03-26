@@ -291,10 +291,10 @@
             var new_row = '<tr>';
             new_row += '<td>' + event.name + '</td>'
             new_row += '<td>' + event.category + '</td>'
-            new_row += '<td>' + event.latitude + '</td>'
-            new_row += '<td>' + event.longitude + '</td>'
+            new_row += '<td>' + event.latitude.toFixed(3) + '</td>'
+            new_row += '<td>' + event.longitude.toFixed(3) + '</td>'
             new_row += '<td>' + event.location_name + '</td>'
-            new_row += '<td>' + event.datetime + '</td>'
+            new_row += '<td>' + new Date(event.datetime).toDateString() + '</td>'
             new_row += '</tr>'
             $("#events-table > tbody:last-child").append(new_row);
         }
