@@ -83,6 +83,7 @@
     <h3>Events. Near you.</h3>
 </div>
 
+<!-- BUTTONS FOR CATEGORIES -->
 <div id="categories">
     <button class='b1' onclick="categoryClick(this, 'party')">Parties</button>
     <button class='b1' onclick="categoryClick(this, 'talk')" id="talk">Talks</button>
@@ -91,6 +92,26 @@
     <button class='b1' onclick="categoryClick(this, 'sports')" id="sports">Sports</button>
     <button class='b1' onclick="categoryClick(this, 'other')" id="other">Other</button>
 </div><br>
+
+<!-- FILTER FORM  -->
+<form id="filterForm">
+  <table>
+    <tr>
+      <td>Start date:</td><td><input type="date" name="startdate"></td>
+    </tr>
+    <tr>
+      <td>End date: </td><td><input type="date" name="enddate"></td>
+    </tr>
+    <tr>
+      <td>Within </td><td><input type="number" name="radius" min="0" max="25000" step="0.5"> miles</td>
+    </tr>
+    <tr>
+      <td><input type="submit" value="go" onclick="milesFilter()"></td>
+    </tr>
+  </table>
+</form>
+
+
 
 <div id="map"></div>
 <br>
