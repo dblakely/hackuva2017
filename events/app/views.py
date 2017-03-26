@@ -1,19 +1,19 @@
 import json
+import random
 
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
 
+from .models import Event
 
-
-from . import models
-# Create your views here.
 
 def index(request):
-    return HttpResponse("<h1>some html</h1>")
+    return HttpResponse("<h1>Home</h1>")
 
-def  get_events(request):
-    events = [event.to_dict() for event in models.Event.objects.all()]
+
+def get_events(request):
+    events = [event.to_dict() for event in Event.objects.all()]
     response = {
         'events': events,
     }
