@@ -1,5 +1,6 @@
 import pprint
 import requests
+import random
 from datetime import datetime
 from collections import deque
 
@@ -53,7 +54,14 @@ class Scraper(object):
                 latitude = event['place']['location'].get('latitude') or "No"
                 longitude = event['place']['location'].get('longitude') or "No"
 
-                category = "Facebook"
+                category = random.choice([
+                    'Sport',
+                    'Party',
+                    'Sale',
+                    'Show',
+                    'Hackathon',
+                    'Other',
+                ])
 
                 arguments = '?name={}&datetime={}&location_name={}&longitude={}&latitude={}&category={}'.format(
                     name, dt, location_name, longitude, latitude, category
