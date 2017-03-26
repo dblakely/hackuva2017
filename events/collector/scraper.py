@@ -24,6 +24,7 @@ class Scraper(object):
     def __init__(self, seed_id):
         self.queue = deque([seed_id])
         self.current_id = None
+        self.visited = set()
 
     def work(self):
         events = requests.get(events_url(self.current_id)).json()['data']
@@ -32,11 +33,12 @@ class Scraper(object):
 
         likes = requests.get(likes_url(self.current_id)).json()['data']
         for other_page_info in likes:
-            if not other_page_info['id'] in self.queue:
+            if not str(other_page_info['id']) in self.queue and str(other_page_info['id']) not in self.visited:
                 self.queue.append(str(other_page_info['id']))
 
     def advance(self):
         self.current_id = self.queue.popleft()
+        self.visited.add(str(self.current_id))
 
     def process_event(self, event):
         try:
@@ -75,15 +77,14 @@ class Scraper(object):
             print("Whoooooooo Weeeeeeeeeee; *waves cowboy hat while stratteling an unconditional try except*")
 
 
-
-
 if __name__ == '__main__':
     print("I am become god, destroyer of worlds.")
 
     # QSU 276409372373884
     # UVA 12527153330
+    # UVA Engineering 121252031280356
 
-    scraper = Scraper('12527153330')
+    scraper = Scraper('121252031280356')
 
     while scraper.queue:
         scraper.advance()
