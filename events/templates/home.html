@@ -25,7 +25,9 @@
         height: 100%;
         margin: 0;
         padding: 0;
+        background-color: #f0f2f5;
       }
+
       #categoryTable {
         width:80%;
         border-radius: 20px;
@@ -73,6 +75,14 @@
         line-height: 30px;
         padding-left: 10px;
       }
+      tr:nth-child(even) {
+        background-color: #fafafa;
+      }
+
+      th, td {
+       padding: 15px;
+       text-align: left;
+     }
 
     </style>
 </head>
@@ -276,6 +286,20 @@
                     position: {lat: event.latitude, lng: event.longitude},
                     map: map,
                     title: event.name
+                });
+
+                // var contentString = event.name;
+                // var y = contentString.split(' ').slice(0,5).join(' ');
+                // var infowindow = new google.maps.InfoWindow({content: y});
+                // infowindow.open(map, marker);
+                google.maps.event.addListener(marker, 'click', function () {
+                // do something with this marker ...
+
+
+                var contentString = this.title;
+                var y = contentString.split(' ').slice(0,5).join(' ');
+                var infowindow = new google.maps.InfoWindow({ content: y });
+                infowindow.open(map, this);
                 });
             }
         );
