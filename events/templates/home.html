@@ -48,6 +48,21 @@
         redrawEvents(data['events']);
       });
 
+
+      function filterEventsByDate(events, startDate, endDate){
+        start_date = new Date(startDate);
+        end_date = new Date(endDate);
+        filtered_events = [];
+        for (var i=0; i<events.length;i++){
+            var event = events[i];
+            var event_date = new Date(event.datetime);
+            if (event_date >= start_date && event_date <= end_date){
+                filtered_events.push(event);
+            }
+        }
+        return filtered_events;
+      };
+
       function redrawEvents(events){
         makeMap(events);
         makeTable(events);

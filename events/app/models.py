@@ -11,6 +11,7 @@ class Event(models.Model):
     latitude = models.DecimalField(max_digits=50, decimal_places=20)
     longitude = models.DecimalField(max_digits=50, decimal_places=20)
 
+
     category = models.CharField(max_length=300, null=True)
 
     def to_dict(self):
