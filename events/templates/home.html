@@ -155,7 +155,7 @@
         if (category_filter_active) filtered = filterEventsByCategory(filtered);
         if (date_filter_active) filtered = filterEventsByDate(filtered, $('#sd').val(), $('#ed').val());
         if (distance_filter_active) filtered = filterEventsByDistance(filtered);
-        console.log("" + events.length + " " + filtered.length);
+        // console.log("" + events.length + " " + filtered.length);
         makeMap(filtered);
         makeTable(filtered);
       };
@@ -164,7 +164,7 @@
         start_date = new Date(startDate);
         end_date = new Date(endDate);
         filtered_events = [];
-        console.log(startDate);
+        // console.log(startDate);
         for (var i=0; i<events.length;i++){
             var event = events[i];
             var event_date = new Date(event.datetime);
@@ -179,13 +179,13 @@
         var fl = [];
         for (var i=0; i<events.length; i++){
             var event = events[i];
-            console.log($("#" + event.category));
+            // console.log($("#" + event.category));
             if ($("#" + event.category).attr('class') == "b1"){
              fl.push(event);
             }
         }
-        console.log(events.length);
-        console.log(fl.length);
+        // console.log(events.length);
+        // console.log(fl.length);
         return fl;
       };
 
