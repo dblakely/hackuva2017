@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <title>Events</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
@@ -47,15 +48,20 @@
             {% endfor %}
         </table>
     <script>
+      $.get("/app/events", function(data){
+        makeMap(data['events']);
+      });
 
-      function initMap() {
+      function makeMap(events){
         var myLatlng = {lat: 38.034, lng: -78.504};
+
         var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 4,
+          zoom: 15,
           center: myLatlng
         });
 
         var infoWindow = new google.maps.InfoWindow({map: map});
+
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 var pos = {
@@ -69,66 +75,21 @@
              }, function() {
                 handleLocationError(true, infoWindow, map.getCenter());
              });
-            } else {
-            // Browser doesn't support Geolocation
+            }
+        else {
             handleLocationError(false, infoWindow, map.getCenter());
-         }
+        }
 
-        {% for event in events%}
-            var name = '{{event.name}}';
-            var lat = '{{event.latitude}}';
-            lat = parseFloat(lat);
-            var long = '{{event.longitude}}';
-            long = parseFloat(long);
-            var location_name = '{{event.location_name}}';
-            var datetime = '{{event.datetime}}';
-            var latLng = {lat: lat,lng: long};
-
-            var marker = new google.maps.Marker({
-                position: latLng,
-                map: map,
-                title: name
-            });
-
-        {% endfor %}
-
-        /*
-        for each (event in events) {
-            var latLng = {lat: parseFloat(event.latitude),
-            parseFloat(lng: event.longitude)}
-            var marker = new google.maps.Marker({
-                position: latLng,
-                map: map,
-                title: 'Click to zoom'
-             });
-        }*/
-
-        var marker = new google.maps.Marker({
-          position: myLatlng,
-          map: map,
-          title: 'Click to zoom'
-        });
-
-
-        map.addListener('center_changed', function() {
-          window.setTimeout(function() {
-            map.panTo(marker.getPosition());
-          }, 3000);
-        });
-
-        marker.addListener('click', function() {
-          map.setZoom(8);
-          map.setCenter(marker.getPosition());
-        });
-
-      }
-
-      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-        infoWindow.setPosition(pos);
-        infoWindow.setContent(browserHasGeolocation ?
-            'Error: The Geolocation service failed.' :
-            'Error: Your browser doesn\'t support geolocation.');
-      }
+        events.forEach(
+            function(event){
+                marker = new google.maps.Marker({
+                    position: {lat: event.latitude, lng: event.longitude},
+                    map: map,
+                    title: event.name
+                });
+            }
+        );
+      };
 
     </script>
     <script async defer
