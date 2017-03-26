@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <title>Events</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-      <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <link  rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
     <style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
@@ -20,28 +20,30 @@
       table, th, td{
         border: 1px solid black;
       }
-    </style>
-  </head>
-  <body>
-    <div>
-        <h1>Event Finder</h1>
-    </div>
-    <div id="map" ></div>
-    <br>
-    <h3>Current Events</h3>
-    <table id="events-table">
-            <thead>
-                <td><b>Event Name</b></td>
-                <td><b>Latitude</b></td>
-                <td><b>Longitude</b></td>
-                <td><b>Location Name</b></td>
-                <td><b>Date and Time</b></td>
-            </thead>
-            <tbody id="events-body">
-            </tbody>
-        </table>
 
-    <script>
+    </style>
+</head>
+<body>
+<div>
+    <h1>Event Finder</h1>
+</div>
+<div id="map"></div>
+<br>
+<h3>Current Events</h3>
+<table id="events-table">
+    <thead>
+    <td><b>Event Name</b></td>
+    <td><b>Category</b></td>
+    <td><b>Latitude</b></td>
+    <td><b>Longitude</b></td>
+    <td><b>Location Name</b></td>
+    <td><b>Date and Time</b></td>
+    </thead>
+    <tbody id="events-body">
+    </tbody>
+</table>
+
+<script>
       $.get("/app/events", function(data){
         redrawEvents(data['events']);
       });
@@ -99,6 +101,7 @@
             var event = events[i];
             var new_row = '<tr>';
             new_row += '<td>' + event.name + '</td>'
+            new_row += '<td>' + event.category + '</td>'
             new_row += '<td>' + event.latitude + '</td>'
             new_row += '<td>' + event.longitude + '</td>'
             new_row += '<td>' + event.location_name + '</td>'
@@ -108,9 +111,10 @@
         }
       };
 
-    </script>
-    <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDT72PMyTM_tomBmjdQgOHhgAopKlTJMw0&callback=initMap">
-    </script>
-  </body>
+
+</script>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDT72PMyTM_tomBmjdQgOHhgAopKlTJMw0&callback=initMap">
+</script>
+</body>
 </html>
