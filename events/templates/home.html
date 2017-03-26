@@ -97,10 +97,10 @@
 <form id="filterForm">
   <table>
     <tr>
-      <td>Start date:</td><td><input type="date" name="startdate" onchange="reget()" value="2016-03-26"></td>
+      <td>Start date:</td><td><input id="sd" type="date" name="startdate" onchange="reget()" value="2016-03-26"></td>
     </tr>
     <tr>
-      <td>End date: </td><td><input type="date" name="enddate" onchange="reget()" value="2017-04-26"></td>
+      <td>End date: </td><td><input id="ed" type="date" name="enddate" onchange="reget()" value="2017-04-26"></td>
     </tr>
     <tr>
       <td>Within </td><td><input type="number" id="radius" min="0" max="25000" step="0.5" value="50" onkeypress="reget()"> miles</td>
@@ -137,7 +137,7 @@
 
 <script>
       var activeCategories = ["Party", "Talk", "Show", "Hackathon", "Sport", "Other"];
-      var date_filter_active = false;
+      var date_filter_active = true;
       var category_filter_active = false;
       var distance_filter_active = true;
       var myLocation = {'lat': 38.034, 'long': -78.504}
@@ -155,7 +155,7 @@
       function redrawEvents(events){
         filtered = events;
         // if (category_filter_active) filtered = filterEventsByCategory(filtered);
-        // if (date_filter_active) filtered = filterEventsByDate(filtered);
+        if (date_filter_active) filtered = filterEventsByDate(filtered, $('#sd').val(), $('#ed').val());
         if (distance_filter_active) filtered = filterEventsByDistance(filtered);
         console.log("" + events.length + " " + filtered.length);
         makeMap(filtered);
@@ -166,6 +166,7 @@
         start_date = new Date(startDate);
         end_date = new Date(endDate);
         filtered_events = [];
+        console.log(startDate);
         for (var i=0; i<events.length;i++){
             var event = events[i];
             var event_date = new Date(event.datetime);
